@@ -16,13 +16,33 @@ onmessage = (function(global) {
                 stored_global.load(arguments[i]);
             }
         }
+        global.setTimeout = function setTimeout(func, timeout) {
+            // In spidermonkey I can't do async timeouts yet,
+            // so just fake it for now.
+            var args = [];
+            for (var i = 0; i < arguments.length; i++) {
+                args.push(arguments[i]);
+            }
+            sleep(timeout / 1000);
+            func.apply(null, args);
+        }
     }
+
     var stored_global = {};
     var globalnames = Object.getOwnPropertyNames(global);
+    var allowed_global = {
+        "Object": true,
+        "Function": true,
+        "Array": true,
+        "postMessage": true,
+        "console": true,
+        "importScripts": true,
+        "sleep": true
+    };
     for (var i = 0; i < globalnames.length; i++) {
         var name = globalnames[i];
         stored_global[name] = global[name];
-        if (name !== "Object" && name !== "Function" && name !== "Array"&& name !== "postMessage" && name !== "console" && name !== "importScripts") {
+        if (allowed_global[name] !== true) {
             try {
                 Object.defineProperty(global, name, {value: undefined});
             } catch (e) {
@@ -38,6 +58,10 @@ onmessage = (function(global) {
     }
 
     var actors = {};
+
+    function spawn(script) {
+        
+    }
 
     return function onmessage(msg) {
         var message = msg.data;
