@@ -25,15 +25,12 @@ for (var i = 0; i < 4; i++) {
 }
 
 function cast(id, pattern, data) {
-    var target = id.split('-'),
-        worknum = target[0],
-        actnum = target[1],
-        worker = workers[worknum];
+    var worker = workers[id.split('-')[0]];
 
     if (data instanceof Address) {
-        worker.postMessage(["castaddress", worknum + "-" + actnum, pattern, data.id]);
+        worker.postMessage(["castaddress", id, pattern, data.id]);
     } else {
-        worker.postMessage(["cast", worknum + "-" + actnum, pattern, data]);
+        worker.postMessage(["cast", id, pattern, data]);
     }
 }
 
