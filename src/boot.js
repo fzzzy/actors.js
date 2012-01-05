@@ -1,4 +1,5 @@
 
+
 var console = {
     log: function() {
         var foo = "";
@@ -9,4 +10,10 @@ var console = {
     }
 };
 
-load("scheduler.js");
+function importScripts() {
+    for (var i = 0; i < arguments.length; i++) {
+        load(arguments[i]);
+    }
+}
+
+importScripts("scheduler.js");

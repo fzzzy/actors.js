@@ -10,6 +10,13 @@ var console = {
 }
 
 onmessage = (function(global) {
+    if (global.importScripts === undefined) {
+        global.importScripts = function importScripts() {
+            for (var i = 0; i < arguments.length; i++) {
+                stored_global.load(arguments[i]);
+            }
+        }
+    }
     var stored_global = {};
     var globalnames = Object.getOwnPropertyNames(global);
     for (var i = 0; i < globalnames.length; i++) {
@@ -49,7 +56,7 @@ onmessage = (function(global) {
         if (pattern === "spawn") {
             var scope = {};
             actors[data] = scope;
-            stored_global.load(message[2]);
+            stored_global.importScripts(message[2]);
         } else if (pattern === "cast") {
             if (actors[data] === undefined || this.oncast === undefined) return;
             oncast(message[2], message[3]);

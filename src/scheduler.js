@@ -61,4 +61,4 @@ function spawn(script) {
     return address;
 }
 
-load("main.js");
+importScripts(arguments[0] ? arguments[0] : "main.js");
