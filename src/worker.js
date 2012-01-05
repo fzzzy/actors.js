@@ -31,7 +31,7 @@ onmessage = (function(global) {
             foo.push(name);
         }
     }
-    postMessage(foo);
+    //postMessage(foo);
 
     function Address(actnum) {
         this.cast = function(pattern, data) {

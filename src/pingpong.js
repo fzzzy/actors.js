@@ -1,4 +1,3 @@
-
 var peer = null;
 
 oncast = function(pattern, data) {
@@ -9,4 +8,3 @@ oncast = function(pattern, data) {
         console.log(data);
     }
 }
-

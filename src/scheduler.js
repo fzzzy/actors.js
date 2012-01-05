@@ -2,20 +2,20 @@
 function make_onmessage(work, num) {
     work.onmessage = function(msg) {
         let message = msg.data;
-        if (message[0] === "cast") {
+        if (typeof message === "string") {
+            console.log(message);
+        } else if (message[0] === "cast") {
             let target = message[1],
                 pattern = message[2],
                 data = message[3];
-            var act = actors[target].cast(pattern, data);
-        }
-        if (typeof message === "string") {
-            console.log(message);
+
+            cast(target, pattern, data);
         }
     }
 }
 
 let workers = [];
-let actors = {};
+let nextworker = 0;
 let actor_id = 0;
 
 for (var i = 0; i < 4; i++) {
@@ -24,31 +24,41 @@ for (var i = 0; i < 4; i++) {
     workers.push(work);
 }
 
-function Address(worker, actnum) {
-    this.actnum = actnum;
-    this.cast = function(pattern, data) {
-        if (data instanceof Address) {
-            worker.postMessage(["castaddress", actnum, pattern, data.actnum]);
-        } else {
-            worker.postMessage(["cast", actnum, pattern, data]);
-        }
+function cast(id, pattern, data) {
+    let target = id.split('-'),
+        worknum = target[0],
+        actnum = target[1],
+        worker = workers[worknum];
+
+    if (data instanceof Address) {
+        worker.postMessage(["castaddress", worknum + "-" + actnum, pattern, data.id]);
+    } else {
+        worker.postMessage(["cast", worknum + "-" + actnum, pattern, data]);
+    }
+}
+
+function Address(id) {
+    this.id = id;
+}
+
+Address.prototype = {
+    cast: function(pattern, data) {
+        cast(this.id, pattern, data);
     }
 }
 
 function spawn(script) {
-    let work = workers.shift(),
+    let worknum = nextworker++,
+        work = workers[worknum],
         num = actor_id++,
-        address = new Address(work, num);
+        address = new Address(worknum + "-" + num);
 
-    actors[num] = address;
-    work.postMessage(["spawn", num, script]);
+    if (nextworker > workers.length - 1) {
+        nextworker = 0;
+    }
+
+    work.postMessage(["spawn", "" + worknum + "-" + num, script]);
     return address;
 }
 
-if (this.document !== undefined) {
-    let script = document.createElement("script");
-    script.src = "main.js";
-    document.head.appendChild(script);
-} else {
-    load("main.js");
-}
+load("main.js");
