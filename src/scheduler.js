@@ -1,11 +1,11 @@
 
 function make_onmessage(work, num) {
     work.onmessage = function(msg) {
-        let message = msg.data;
+        var message = msg.data;
         if (typeof message === "string") {
             console.log(message);
         } else if (message[0] === "cast") {
-            let target = message[1],
+            var target = message[1],
                 pattern = message[2],
                 data = message[3];
 
@@ -14,18 +14,18 @@ function make_onmessage(work, num) {
     }
 }
 
-let workers = [];
-let nextworker = 0;
-let actor_id = 0;
+var workers = [];
+var nextworker = 0;
+var actor_id = 0;
 
 for (var i = 0; i < 4; i++) {
-    let work = new Worker("worker.js");
+    var work = new Worker("worker.js");
     make_onmessage(work, i);
     workers.push(work);
 }
 
 function cast(id, pattern, data) {
-    let target = id.split('-'),
+    var target = id.split('-'),
         worknum = target[0],
         actnum = target[1],
         worker = workers[worknum];
@@ -48,7 +48,7 @@ Address.prototype = {
 }
 
 function spawn(script) {
-    let worknum = nextworker++,
+    var worknum = nextworker++,
         work = workers[worknum],
         num = actor_id++,
         address = new Address(worknum + "-" + num);
@@ -61,4 +61,4 @@ function spawn(script) {
     return address;
 }
 
-importScripts(arguments[0] ? arguments[0] : "main.js");
+importScripts(arguments[0] ? arguments[0] : "examples/pingpong.js");

@@ -22,7 +22,7 @@ onmessage = (function(global) {
     for (var i = 0; i < globalnames.length; i++) {
         var name = globalnames[i];
         stored_global[name] = global[name];
-        if (name !== "Object" && name !== "Function" && name !== "Array"&& name !== "postMessage" && name !== "console") {
+        if (name !== "Object" && name !== "Function" && name !== "Array"&& name !== "postMessage" && name !== "console" && name !== "importScripts") {
             try {
                 Object.defineProperty(global, name, {value: undefined});
             } catch (e) {
@@ -30,15 +30,6 @@ onmessage = (function(global) {
             }
         }
     }
-
-    var foo = ["foo"];
-    for (var j = 0; j < globalnames.length; j++) {
-        var name = globalnames[j];
-        if (global[name] !== undefined) {
-            foo.push(name);
-        }
-    }
-    //postMessage(foo);
 
     function Address(actnum) {
         this.cast = function(pattern, data) {
@@ -56,12 +47,12 @@ onmessage = (function(global) {
         if (pattern === "spawn") {
             var scope = {};
             actors[data] = scope;
-            stored_global.importScripts(message[2]);
+            importScripts(message[2]);
         } else if (pattern === "cast") {
-            if (actors[data] === undefined || this.oncast === undefined) return;
+            if (actors[data] === undefined || oncast === undefined) return;
             oncast(message[2], message[3]);
         } else if (pattern === "castaddress") {
-            if (actors[data] === undefined || this.oncast === undefined) return;
+            if (actors[data] === undefined || oncast === undefined) return;
 
             var subpat = message[2],
                 address = new Address(message[3]);
@@ -70,3 +61,4 @@ onmessage = (function(global) {
         }
     }
 })(this);
+
