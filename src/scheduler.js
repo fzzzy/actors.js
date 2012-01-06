@@ -11,7 +11,7 @@ function make_onmessage(work, num) {
             } catch (e) {
                 console.log(num, message);
             }
-        } else if (message[0] === "cast" || message[0] === "grant") {
+        } else if (message[0] === "cast" || message[0] === "grant" || message[0] === "revoke") {
             var target = message[1],
                 pattern = message[2],
                 data = message[3];
@@ -43,7 +43,12 @@ function cast(id, pattern, data, mode) {
     var worker = workers[id.split('-')[0]];
 
     if (mode === "grant") {
-        worker.postMessage(["ongrant", id, pattern, data]);
+        var nonce = id + ':' + data;
+        children[nonce] = id;
+        worker.postMessage(["ongrant", id, pattern, nonce]);
+    } else if (mode === "revoke") {
+        var nonce = id + ':' + data;
+        children[nonce] = undefined;
     } else {
         worker.postMessage(["oncast", id, pattern, data]);
     }
@@ -56,6 +61,9 @@ function Address(id) {
 Address.prototype = {
     cast: function(pattern, data) {
         cast(this.id, pattern, data);
+    },
+    grant: function(pattern, data) {
+        cast(this.id, pattern, data, "grant");
     }
 }
 

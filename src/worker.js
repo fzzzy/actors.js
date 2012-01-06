@@ -61,10 +61,12 @@ onmessage = (function(global) {
     function Address(actnum) {
         this.id = actnum;
         this.cast = function(pattern, data) {
-            if (data instanceof Address) {
-                postMessage(["grant", actnum, pattern, data.id]);
-            } else {
                 postMessage(["cast", actnum, pattern, data]);
+        }
+        this.grant = function grant(pattern, data) {
+            postMessage(["grant", actnum, pattern, data.id]);
+            return function revoke() {
+                postMessage(["revoke", actnum, pattern, data.id]);
             }
         }
     }
