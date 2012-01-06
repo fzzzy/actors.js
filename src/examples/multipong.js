@@ -9,8 +9,7 @@ function spawn_pair(name) {
     a1.cast("message", ["Hello, " + name, 0]);
 }
 
-spawn_pair("Fred Flintstone");
+for (var i = 0; i < 20; i++) {
+    spawn_pair("Fred Flintstone" + i);
+}
 
-setTimeout(spawn_pair, 250, "Barney Rubble");
-setTimeout(spawn_pair, 500, "George Jetson");
-setTimeout(spawn_pair, 750, "Mighty Mouse");

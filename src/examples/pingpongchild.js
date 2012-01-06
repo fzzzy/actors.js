@@ -7,11 +7,11 @@ oncast = (function() {
         if (pattern === "peer") {
             peer = data;
         } else if (pattern === "message") {
-            console.log(data[1] + ": " + data[0] + " ");
+            console.log(data[0] + " " + data[1] + " ");
             data[1] = data[1] + 1;
-            setTimeout(function() {
-                peer.cast("message", data);
-            }, 1000);
+            //setTimeout(function() {
+            peer.cast("message", data);
+            //}, 1000);
         }
     }
 })();

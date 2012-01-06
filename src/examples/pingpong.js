@@ -7,7 +7,8 @@ var revoke1 = a1.grant("peer", a2),
 
 a1.cast("message", ["Hello, World", 0]);
 
-setTimeout(function() {
+/*setTimeout(function() {
     revoke1();
     revoke2();
-}, 5000);
+}, 20000);
+*/

@@ -2,6 +2,8 @@
 function make_onmessage(work, num) {
     work.onmessage = function(msg) {
         var message = msg.data;
+        //console.log("onmessage", message);
+
         if (typeof message === "string") {
             try {
                 var node = document.createElement("span");
@@ -36,19 +38,20 @@ for (var i = 0; i < 4; i++) {
 }
 
 function cast(id, pattern, data, mode) {
+    var oldid = id;
     if (children[id] !== undefined) {
         id = children[id];
     }
-    //console.log("cast", id, mode, pattern, data);
+    //console.log("cast", oldid, id, mode, pattern, data, children[data]);
     var worker = workers[id.split('-')[0]];
 
     if (mode === "grant") {
         var nonce = id + ':' + data;
-        children[nonce] = id;
+        children[nonce] = children[data];
         worker.postMessage(["ongrant", id, pattern, nonce]);
     } else if (mode === "revoke") {
         var nonce = id + ':' + data;
-        children[nonce] = undefined;
+        children[id] = undefined;
     } else {
         worker.postMessage(["oncast", id, pattern, data]);
     }
