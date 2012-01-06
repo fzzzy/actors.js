@@ -21,7 +21,7 @@ onmessage = (function(global) {
             // In spidermonkey I can't do async timeouts yet,
             // so just fake it for now.
             var args = [];
-            for (var i = 0; i < arguments.length; i++) {
+            for (var i = 2; i < arguments.length; i++) {
                 args.push(arguments[i]);
             }
             sleep(timeout / 1000);
@@ -29,24 +29,26 @@ onmessage = (function(global) {
         }
     }
 
-    var stored_global = {};
-    var globalnames = Object.getOwnPropertyNames(global);
-    var allowed_global = {
+    var clean_names = {},
+        stored_global = {},
+        globalnames = Object.getOwnPropertyNames(global),
+        allowed_global = {
         "Object": true,
         "Function": true,
         "Array": true,
         "postMessage": true,
         "console": true,
         "importScripts": true,
-        "setTimeout": true,
         "sleep": true,
         "spawn": true,
-        "onmessage": true
+        "onmessage": true,
+        "setTimeout": true
     };
     for (var i = 0; i < globalnames.length; i++) {
         var name = globalnames[i];
         stored_global[name] = global[name];
         if (allowed_global[name] !== true) {
+            clean_names[name] = true;
             try {
                 Object.defineProperty(global, name, {value: undefined});
             } catch (e) {
@@ -54,6 +56,7 @@ onmessage = (function(global) {
             }
         }
     }
+    stored_global.setTimeout = setTimeout;
 
     function Address(actnum) {
         this.id = actnum;
@@ -79,16 +82,23 @@ onmessage = (function(global) {
     global.spawn = spawn;
 
     function populate_scope() {
+        //console.log("populate", actor_id);
         var scope = actors[actor_id];
         for (var name in scope) {
+            //console.log("pop", name);
             global[name] = scope[name];
         }
     }
 
     function clean_scope() {
-        var scope = actors[actor_id];
-        for (var name in global) {
-            if (allowed_global[name] !== true) {
+        //console.log("clean", actor_id);
+        var scope = actors[actor_id],
+            names = Object.getOwnPropertyNames(global);
+
+        for (var i = 0; i < names.length; i++) {
+            var name = names[i];
+            if (allowed_global[name] !== true && clean_names[name] !== true) {
+            //console.log("saving scope", name, clean_names[name]);
                 scope[name] = global[name];
                 global[name] = undefined;
             }
@@ -97,6 +107,7 @@ onmessage = (function(global) {
 
     return function onmessage(msg) {
         var message = msg.data;
+        //console.log("work", message);
         var pattern = message[0],
             data = message[1];
 
@@ -107,11 +118,13 @@ onmessage = (function(global) {
             importScripts(message[2]);
             clean_scope();
         } else if (pattern === "cast") {
+            //console.log("castttt", actors[data]);
             if (actors[data] !== undefined) {
                 actor_id = data;
                 populate_scope();
-                if (oncast !== undefined) {
-                    oncast(message[2], message[3]);
+                //console.log("def", oncast !== undefined);
+                if (global.oncast !== undefined) {
+                    global.oncast(message[2], message[3]);
                 }
                 clean_scope();
             }

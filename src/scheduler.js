@@ -3,7 +3,14 @@ function make_onmessage(work, num) {
     work.onmessage = function(msg) {
         var message = msg.data;
         if (typeof message === "string") {
-            console.log(message);
+            try {
+                var node = document.createElement("span");
+                node.appendChild(
+                    document.createTextNode(message));
+                document.body.appendChild(node);
+            } catch (e) {
+                console.log(num, message);
+            }
         } else if (message[0] === "cast" || message[0] === "castaddress") {
             var target = message[1],
                 pattern = message[2],
@@ -32,6 +39,7 @@ function cast(id, pattern, data, mode) {
     if (children[id] !== undefined) {
         id = children[id];
     }
+    //console.log("cast", id, mode, pattern, data);
     var worker = workers[id.split('-')[0]];
 
     if (mode === "castaddress") {
@@ -64,4 +72,10 @@ function spawn(script) {
     return address;
 }
 
-spawn("examples/pingpong.js");
+if (arguments.length) {
+    for (var i = 0; i < arguments.length; i++) {
+        spawn(arguments[i]);
+    }
+} else {
+    spawn("examples/pingpong.js");
+}
