@@ -10,7 +10,8 @@ function spawn_pair(name) {
 }
 
 spawn_pair("Fred Flintstone");
+spawn_pair("Barney Rubble");
+spawn_pair("George Jetson");
+spawn_pair("Mighty Mouse");
+spawn_pair("Powdered Toast Man");
 
-setTimeout(spawn_pair, 250, "Barney Rubble");
-setTimeout(spawn_pair, 500, "George Jetson");
-setTimeout(spawn_pair, 750, "Mighty Mouse");

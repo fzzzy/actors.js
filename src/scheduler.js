@@ -4,10 +4,13 @@ function make_onmessage(work, num) {
         var message = msg.data;
         if (typeof message === "string") {
             try {
-                var node = document.createElement("span");
+                var node = document.createElement("div");
                 node.appendChild(
                     document.createTextNode(message));
                 document.body.appendChild(node);
+                while (document.body.childNodes.length > 50) {
+                    document.body.removeChild(document.body.firstChild);
+                }
             } catch (e) {
                 console.log(num, message);
             }
@@ -73,6 +76,7 @@ function spawn(script) {
         num = actor_id++,
         address = new Address(worknum + "-" + num);
 
+    //console.log("spawn worknum", worknum);
     if (nextworker > workers.length - 1) {
         nextworker = 0;
     }
