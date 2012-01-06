@@ -4,17 +4,21 @@ function make_onmessage(work, num) {
         var message = msg.data;
         if (typeof message === "string") {
             console.log(message);
-        } else if (message[0] === "cast") {
+        } else if (message[0] === "cast" || message[0] === "castaddress") {
             var target = message[1],
                 pattern = message[2],
                 data = message[3];
 
-            cast(target, pattern, data);
+            cast(target, pattern, data, message[0]);
+        } else if (message[0] === "spawnchild") {
+            var child = spawn(message[2]);
+            children[message[1]] = child.id;
         }
     }
 }
 
 var workers = [];
+var children = {};
 var nextworker = 0;
 var actor_id = 0;
 
@@ -24,11 +28,14 @@ for (var i = 0; i < 4; i++) {
     workers.push(work);
 }
 
-function cast(id, pattern, data) {
+function cast(id, pattern, data, mode) {
+    if (children[id] !== undefined) {
+        id = children[id];
+    }
     var worker = workers[id.split('-')[0]];
 
-    if (data instanceof Address) {
-        worker.postMessage(["castaddress", id, pattern, data.id]);
+    if (mode === "castaddress") {
+        worker.postMessage(["castaddress", id, pattern, data]);
     } else {
         worker.postMessage(["cast", id, pattern, data]);
     }
@@ -53,9 +60,8 @@ function spawn(script) {
     if (nextworker > workers.length - 1) {
         nextworker = 0;
     }
-
     work.postMessage(["spawn", "" + worknum + "-" + num, script]);
     return address;
 }
 
-importScripts(arguments[0] ? arguments[0] : "examples/pingpong.js");
+spawn("examples/pingpong.js");

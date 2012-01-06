@@ -1,15 +1,16 @@
-var name = null,
-    peer = null;
 
-oncast = function(pattern, data) {
-    if (pattern === "name") {
-        name = data;
-    } else if (pattern === "peer") {
-        peer = data;
-    } else if (pattern === "message") {
-        console.log(data);
-        setTimeout(function() {
-            peer.cast("message", "Hello.");
-        }, 1000);
+oncast = (function() {
+    var name = null,
+        peer = null;
+
+    return function(pattern, data) {
+        if (pattern === "peer") {
+            peer = data;
+        } else if (pattern === "message") {
+            console.log(data);
+            setTimeout(function() {
+                peer.cast("message", data);
+            }, 1000);
+        }
     }
-}
+})();
