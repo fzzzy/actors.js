@@ -62,7 +62,7 @@ onmessage = (function(global) {
         this.id = actnum;
         this.cast = function(pattern, data) {
             if (data instanceof Address) {
-                postMessage(["castaddress", actnum, pattern, data.id]);
+                postMessage(["grant", actnum, pattern, data.id]);
             } else {
                 postMessage(["cast", actnum, pattern, data]);
             }
@@ -76,7 +76,7 @@ onmessage = (function(global) {
     function spawn(script) {
         var num = childid++,
             name = actor_id + "-" + num;
-        postMessage(["spawnchild", name, script]);
+        postMessage(["spawn", name, script]);
         return new Address(name);
     }
     global.spawn = spawn;
@@ -111,13 +111,13 @@ onmessage = (function(global) {
         var pattern = message[0],
             data = message[1];
 
-        if (pattern === "spawn") {
+        if (pattern === "onspawn") {
             var scope = {};
             actor_id = data;
             actors[data] = scope;
             importScripts(message[2]);
             clean_scope();
-        } else if (pattern === "cast") {
+        } else if (pattern === "oncast") {
             //console.log("castttt", actors[data]);
             if (actors[data] !== undefined) {
                 actor_id = data;
@@ -128,7 +128,7 @@ onmessage = (function(global) {
                 }
                 clean_scope();
             }
-        } else if (pattern === "castaddress") {
+        } else if (pattern === "ongrant") {
             if (actors[data] !== undefined) {
                 var subpat = message[2],
                     address = new Address(message[3]);

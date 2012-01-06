@@ -11,13 +11,13 @@ function make_onmessage(work, num) {
             } catch (e) {
                 console.log(num, message);
             }
-        } else if (message[0] === "cast" || message[0] === "castaddress") {
+        } else if (message[0] === "cast" || message[0] === "grant") {
             var target = message[1],
                 pattern = message[2],
                 data = message[3];
 
             cast(target, pattern, data, message[0]);
-        } else if (message[0] === "spawnchild") {
+        } else if (message[0] === "spawn") {
             var child = spawn(message[2]);
             children[message[1]] = child.id;
         }
@@ -42,10 +42,10 @@ function cast(id, pattern, data, mode) {
     //console.log("cast", id, mode, pattern, data);
     var worker = workers[id.split('-')[0]];
 
-    if (mode === "castaddress") {
-        worker.postMessage(["castaddress", id, pattern, data]);
+    if (mode === "grant") {
+        worker.postMessage(["ongrant", id, pattern, data]);
     } else {
-        worker.postMessage(["cast", id, pattern, data]);
+        worker.postMessage(["oncast", id, pattern, data]);
     }
 }
 
@@ -68,7 +68,7 @@ function spawn(script) {
     if (nextworker > workers.length - 1) {
         nextworker = 0;
     }
-    work.postMessage(["spawn", "" + worknum + "-" + num, script]);
+    work.postMessage(["onspawn", worknum + "-" + num, script]);
     return address;
 }
 
