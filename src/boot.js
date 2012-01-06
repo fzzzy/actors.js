@@ -1,4 +1,5 @@
-
+#!/usr/bin/env js
+// For spidermonkey with --enable-threadsafe
 
 var console = {
     log: function() {
